@@ -1,4 +1,4 @@
-# This file is going to some introduction regarding how to build the Accel-sim Docker images 
+# This file gives the introduction regarding how to build the Accel-sim Docker images 
 
 ## Dependencies
 It need to have Docker and Nvidia docker installed. This Readme does not conver this part
