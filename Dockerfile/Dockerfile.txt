@@ -1,0 +1,78 @@
+FROM nvcr.io/nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04
+#FROM ubuntu:20.04
+WORKDIR /root
+
+RUN echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+
+#define timzone
+ENV TZ=Asia/Shanghai
+#set timzezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo '$TZ' > /etc/timezone
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  build-essential git wget \
+  freeglut3-dev libxi-dev libxmu-dev \
+  xutils-dev bison zlib1g-dev flex libglu1-mesa-dev zip unzip \
+  python3  python3-pip make cmake vim
+
+RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main" >> /etc/apt/sources.list
+RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe" >> /etc/apt/sources.list
+
+RUN apt-get update && apt-get -y install gcc-7 g++-7
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+
+RUN apt-get clean autoclean && rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
+RUN wget https://developer.download.nvidia.com/compute/cuda/11.0.3/local_installers/cuda_11.0.3_450.51.06_linux.run
+RUN sh cuda_11.0.3_450.51.06_linux.run --silent --toolkit
+RUN rm cuda_11.0.3_450.51.06_linux.run
+RUN ln -s /usr/local/cuda-11.0 /usr/local/cuda
+
+ENV CUDA_INSTALL_PATH="/usr/local/cuda"
+ENV PATH="${CUDA_INSTALL_PATH}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CUDA_INSTALL_PATH}/lib64"
+
+
+#################following to build GPGPU-Sim alone ##############
+#RUN git clone  https://github.com/gpgpu-sim/gpgpu-sim_distribution 
+WORKDIR /root/gpgpu-sim_distribution
+SHELL ["/bin/bash", "-c"]
+RUN "setup_environment"
+#pls run " make" inside running docker containner
+
+
+#################following to build accel-sim including GPGPU-Sim ##############
+#################source command has to run inside docker container, so you have to build the Accel inside container ##########
+RUN apt-get update && apt-get install  -y --no-install-recommends \
+    libssl-dev libxml2-dev libboost-all-dev vim python-setuptools python3-dev bc \
+    opencl-headers ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo
+
+RUN mkdir -p /root/.pip
+RUN echo "[global]" >> /root/.pip/pip.conf
+RUN echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple"  >> /root/.pip/pip.conf
+RUN echo "trusted-host = pypi.tuna.tsinghua.edu.cn" >> /root/.pip/pip.conf
+RUN echo "disable-pip-version-check = true" >> /root/.pip/pip.conf
+
+RUN pip3 install pyyaml psutil plotly
+RUN git clone https://github.com/accel-sim/accel-sim-framework
+
+WORKDIR /root/accel-sim-framework
+#Pls run following two command inside running docker containner 
+#RUN ./util/tracer_nvbit/install_nvbit.sh 
+#RUN make -C ./util/tracer_nvbit
+
+RUN git clone https://github.com/accel-sim/gpu-app-collection  /root/accel-sim-framework/gpu-app-collection
+SHELL ["/bin/bash", "-c"]
+RUN  "./gpu-app-collection/src/setup_environment"
+
+#Pls run following two command inside running docker containner
+#RUN make -j -C ./gpu-app-collection/src rodinia_2.0-ft  
+#RUN make -C ./gpu-app-collection/src data 
+
+RUN pip3 install -r requirements.txt
+RUN "./gpu-simulator/setup_environment.sh"
+#Pls run following command inside running docker containner
+#RUN "make -j -C ./gpu-simulator/"
+
