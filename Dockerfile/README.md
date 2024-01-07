@@ -4,7 +4,7 @@
 It need to have Docker and Nvidia docker installed. This Readme does not conver this part
 
 ## Notes.
-Though use this docker file can simply your work to build Accel, but you still need to do some steps after you have the docker containner running. This is because some build script has problem to run when building the docker images. The extra step has been given in the Dockerfile.txt, you can refer to them
+Though using this docker file can simply your work to build Accel-sim, you still need to do further build steps after you have the docker containner running. This is because that some build script has problem to run when building the docker images. The extra step has been given in the Dockerfile.txt, you can refer to them, for example
 ```bash
 WORKDIR /root/accel-sim-framework
 #Pls run following two command inside running docker containner
