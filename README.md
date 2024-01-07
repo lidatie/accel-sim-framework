@@ -29,8 +29,8 @@ run:
 
 ```bash
 sudo apt-get install  -y wget build-essential xutils-dev bison zlib1g-dev flex \
-      libglu1-mesa-dev git g++ libssl-dev libxml2-dev libboost-all-dev git g++ \
-      libxml2-dev vim python-setuptools python-dev build-essential python-pip
+      libglu1-mesa-dev git libssl-dev libxml2-dev libboost-all-dev vim zip unzip \
+      libxml2-dev vim python-setuptools python-dev python-pip
 
 pip3 install pyyaml plotly psutil
 wget http://developer.download.nvidia.com/compute/cuda/11.0.1/local_installers/cuda_11.0.1_450.36.06_linux.run
@@ -40,7 +40,30 @@ rm cuda_11.0.1_450.36.06_linux.run
 
 Note, that all the python scripts have more detailed options explanations when run with "--help"
 
-
+Accel-sim has to be built with gcc(g++) version 5 or version 7. If a version higher than 7 is being used, Accel-sim will run to a core dump issue.
+Following is the steps to install gcc-7 and g++-7 suppose you had already have gcc-7(g++-9) installed
+```bash
+vim /etc/apt/sources.list
+```
+Add
+```bash
+deb http://dk.archive.ubuntu.com/ubuntu/ xenial main 
+deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
+```
+Then run
+```bash
+apt-get update
+apt-get install gcc-7 g++-7
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+```
+```bash
+Run following command, and select version 7
+update-alternatives --config gcc
+update-alternatives --config gcc
+```
 ## Overview
 
 The code for the Accel-Sim and AccelWattch frameworks are in this repo. Accel-Sim 1.0 uses the
@@ -126,7 +149,7 @@ AccelWattch microbenchmarks and AccelWattch validation set benchmarks are also i
     ```
     Eg:
     ```bash
-    ./util/job_launching/run_simulations.py -B rodinia_2.0-ft -C QV100-PTX -N myTest-PTX
+    ./util/job_launching/run_simulations.py -B rodinia_2.0-ft -C QV100-PTX -N myTest
     ```
     
     
