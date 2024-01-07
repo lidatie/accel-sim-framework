@@ -41,7 +41,7 @@ rm cuda_11.0.1_450.36.06_linux.run
 Note, that all the python scripts have more detailed options explanations when run with "--help"
 
 Accel-sim has to be built with gcc(g++) version 5 or version 7. If a version higher than 7 is being used, Accel-sim will run to a core dump issue.
-Following is the steps to install gcc-7 and g++-7 suppose you had already have gcc-7(g++-9) installed
+Following is the steps to install gcc-7 and g++-7 suppose you had already have gcc-9(g++-9) installed
 ```bash
 vim /etc/apt/sources.list
 ```
@@ -59,8 +59,8 @@ update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
 update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
 ```
-```bash
 Run following command, and select version 7
+```bash
 update-alternatives --config gcc
 update-alternatives --config gcc
 ```
